@@ -4,14 +4,20 @@
 // 3秒に1回リロードする
 const RELOAD_INTERVAL = 3000;
 
+let content_header_hash;
+
 (() => {
     const timerId = setInterval(() => {
         const notion_page_main_element = document.getElementsByTagName('main');
-
+        
+        
         // wait until page loads
         if (notion_page_main_element !== undefined) {
             try {
-                insert_toc();
+                // ハッシュ値が変わったら更新を行う
+                if (check_update()) {
+                    insert_toc();
+                } 
                 // clearInterval(timerId);
             } catch {
 
@@ -19,6 +25,32 @@ const RELOAD_INTERVAL = 3000;
         }
     }, RELOAD_INTERVAL);
 })();
+
+// 文字列をハッシュ値に変換する
+String.prototype.hashCode = function() {
+    var hash = 0,
+      i, chr;
+    if (this.length === 0) return hash;
+    for (i = 0; i < this.length; i++) {
+      chr = this.charCodeAt(i);
+      hash = ((hash << 5) - hash) + chr;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+}
+
+const check_update = function() {
+    const headers = document.querySelectorAll(
+        '.notion-header-block, .notion-sub_header-block, .notion-sub_sub_header-block');
+    const headers_array_str = Array.from(headers).join(',');
+
+    if (content_header_hash != headers_array_str.hashCode()) {
+        content_header_hash = headers_array_str.hashCode();
+        console.log('ToC will be updated');
+        return true;
+    }
+    return false;
+} 
 
 // ToCの追加
 const insert_toc = function() {
@@ -122,6 +154,10 @@ const insert_toc = function() {
         let toc_tree_html = `<div class="notion-selectable notion-collection_view_page-block">`;
         let previous_level = 0;
         for (let i=0; i < header_text_array.length; i++) {
+            // 見出し文字がないならばスキップ
+            if (header_text_array[i] === "") {
+                continue;
+            } 
             const header_block_html = create_header_block(
                 header_text_array[i], 
                 header_block_uri_array[i],
