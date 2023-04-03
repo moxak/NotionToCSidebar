@@ -40,9 +40,9 @@ String.prototype.hashCode = function() {
 }
 
 const check_update = function() {
-    const headers = document.querySelectorAll(
-        '.notion-header-block, .notion-sub_header-block, .notion-sub_sub_header-block');
-    const headers_array_str = Array.from(headers).join(',');
+    const headers = [...document.querySelectorAll(
+        '.notion-header-block, .notion-sub_header-block, .notion-sub_sub_header-block')];
+    const headers_array_str = headers.join(',');
 
     if (content_header_hash != headers_array_str.hashCode()) {
         content_header_hash = headers_array_str.hashCode();
