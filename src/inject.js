@@ -40,6 +40,7 @@ String.prototype.hashCode = function() {
 }
 
 const check_update = function() {
+    // 上限は65536個。またIEでは動作しない
     const headers = [...document.querySelectorAll(
         '.notion-header-block, .notion-sub_header-block, .notion-sub_sub_header-block')];
     const headers_array_str = headers.join(',');
